@@ -20,11 +20,10 @@ struct VertexOut {
 vertex VertexOut vertex_main(VertexIn in [[stage_in]], constant Uniforms& uniforms [[buffer(1)]]) {
     VertexOut out;
 
-    // Apply rotation and translation to the position
     float4 position = float4(in.position.x, in.position.y, in.position.z, 1.0);
-    position = uniforms.modelMatrix * position;        // Transform with model matrix
-    position = uniforms.viewMatrix * position;         // Transform with view matrix
-    out.position = uniforms.projectionMatrix * position;  // Apply projection
+    position = uniforms.modelMatrix * position;
+    position = uniforms.viewMatrix * position;
+    out.position = uniforms.projectionMatrix * position;
     
     out.color = in.color;
     
