@@ -21,7 +21,7 @@ struct VertexOut {
     float3 viewPosition;
 };
 
-struct Light {
+struct ResolvedLight {
     float3 position;
     float3 color;
     float intensity;
@@ -29,16 +29,16 @@ struct Light {
 
 vertex VertexOut vertex_main(VertexIn in [[stage_in]], constant Uniforms& uniforms [[buffer(1)]]) {
     VertexOut out;
-
-    float4 position = float4(in.position.x, in.position.y, in.position.z, 1.0);
     
-    float4 worldPosition = uniforms.modelMatrix * position;
+    float4 worldPosition = uniforms.modelMatrix * in.position;
     
     out.normal = (uniforms.modelMatrix * float4(in.normal, 0.0)).xyz;
     out.worldPosition = worldPosition.xyz;
     
     float4 viewPosition = uniforms.viewMatrix * worldPosition;
     out.viewPosition = viewPosition.xyz;
+    
+    float4 position = in.position;
     
     position = uniforms.modelMatrix * position;
     position = uniforms.viewMatrix * position;
@@ -49,7 +49,7 @@ vertex VertexOut vertex_main(VertexIn in [[stage_in]], constant Uniforms& unifor
     return out;
 }
 
-fragment float4 fragment_main(VertexOut in [[stage_in]], constant Light &light [[buffer(2)]]) {
+fragment float4 fragment_main(VertexOut in [[stage_in]], constant ResolvedLight &light [[buffer(2)]]) {
     float3 normal = normalize(in.normal);
     float3 lightDir = normalize(light.position - in.worldPosition);
 

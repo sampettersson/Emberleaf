@@ -136,9 +136,11 @@ class Renderer: NSObject, MTKViewDelegate {
         renderEncoder?.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
         renderEncoder?.setCullMode(.none)
         
-        if var (_, light) = world.query(with: Light.self) {
-            renderEncoder?.setVertexBytes(&light, length: MemoryLayout<Light>.stride, index: 2)
-            renderEncoder?.setFragmentBytes(&light, length: MemoryLayout<Light>.stride, index: 2)
+        if let (_, light, transform) = world.query(with: Light.self, Transform.self) {
+            var resolvedLight = ResolvedLight(light, transform)
+            
+            renderEncoder?.setVertexBytes(&resolvedLight, length: MemoryLayout<ResolvedLight>.stride, index: 2)
+            renderEncoder?.setFragmentBytes(&resolvedLight, length: MemoryLayout<ResolvedLight>.stride, index: 2)
         }
                 
         let vertexBuffer = device.makeBuffer(
