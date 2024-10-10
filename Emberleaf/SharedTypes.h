@@ -13,6 +13,7 @@
 struct Vertex {
     vector_float3 position;
     vector_float4 color;
+    vector_float3 normal;
 };
 
 #endif /* SharedTypes_h */

@@ -24,6 +24,8 @@ struct DemoView: View {
                 rotation: SIMD3(rotationX, rotationY, 0),
                 scale: SIMD3(1, 1, 1)
             )
+            
+            Entity() & Light(position: SIMD3<Float>(2, 2, 2), color: SIMD3<Float>(1, 1, 1), intensity: 1.0)
         }.gesture(DragGesture().onChanged({ value in
             rotationY = Float(value.translation.width / 20)
             rotationX = Float(value.translation.height / 20)

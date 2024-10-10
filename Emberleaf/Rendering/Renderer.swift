@@ -33,6 +33,11 @@ class Renderer: NSObject, MTKViewDelegate {
         vertexDescriptor.attributes[1].format = .float4    // Each color is a 4-component float (SIMD4<Float>)
         vertexDescriptor.attributes[1].offset = MemoryLayout<SIMD3<Float>>.stride  // Offset by the size of the position
         vertexDescriptor.attributes[1].bufferIndex = 0     // Same vertex buffer
+        
+        // Normal attribute (index 2)
+        vertexDescriptor.attributes[2].format = .float3    // Each color is a 3-component float (SIMD3<Float>)
+        vertexDescriptor.attributes[2].offset = MemoryLayout<SIMD3<Float>>.stride + MemoryLayout<SIMD4<Float>>.stride  // Offset by the size of the position
+        vertexDescriptor.attributes[2].bufferIndex = 0     // Same vertex buffer
 
         // Set stride (size of each vertex)
         vertexDescriptor.layouts[0].stride = MemoryLayout<Vertex>.stride
@@ -130,6 +135,11 @@ class Renderer: NSObject, MTKViewDelegate {
         var uniforms = Uniforms(modelMatrix: modelMatrix, viewMatrix: viewMatrix, projectionMatrix: projectionMatrix)
         renderEncoder?.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
         renderEncoder?.setCullMode(.none)
+        
+        if var (_, light) = world.query(with: Light.self) {
+            renderEncoder?.setVertexBytes(&light, length: MemoryLayout<Light>.stride, index: 2)
+            renderEncoder?.setFragmentBytes(&light, length: MemoryLayout<Light>.stride, index: 2)
+        }
                 
         let vertexBuffer = device.makeBuffer(
             bytes: cube.vertices,
