@@ -53,7 +53,7 @@ fragment float4 fragment_main(VertexOut in [[stage_in]], constant Light &light [
     float3 normal = normalize(in.normal);
     float3 lightDir = normalize(light.position - in.worldPosition);
 
-    float ambientStrength = 0.1;
+    float ambientStrength = 0.2;
     float3 ambient = ambientStrength * light.color;
 
     float diffuseStrength = max(dot(normal, lightDir), 0.0);
