@@ -22,6 +22,7 @@ class Renderer: NSObject, MTKViewDelegate {
     private var indices: [UInt16]
     private var aspectRatio: Float = 0
     private var depthStencilState: MTLDepthStencilState
+    private var world: World
     
     static func createVertexDescriptor() -> MTLVertexDescriptor {
         let vertexDescriptor = MTLVertexDescriptor()
@@ -43,7 +44,7 @@ class Renderer: NSObject, MTKViewDelegate {
         return vertexDescriptor
     }
     
-    init(device: MTLDevice) {
+    init(device: MTLDevice, world: World) {
         self.device = device
         
         self.commandQueue = device.makeCommandQueue()!
@@ -106,7 +107,13 @@ class Renderer: NSObject, MTKViewDelegate {
 
         depthStencilState = device.makeDepthStencilState(descriptor: depthStencilDescriptor)!
         
+        self.world = world
+        
         super.init()
+    }
+    
+    func updateWorld(_ world: World) {
+        self.world = world
     }
     
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
@@ -145,17 +152,11 @@ class Renderer: NSObject, MTKViewDelegate {
             zfar: 1
         ))
 
-        let camera = Camera(
-            position: SIMD3<Float>(0, 0, 5),
-            target: SIMD3<Float>(0, 0, 0),
-            up: SIMD3<Float>(0, 1, 0)
-        )
+        let modelMatrix = modelMatrix(translation: SIMD3(0, 0, 0), rotation: SIMD3(1, 0, 0), scale: SIMD3(1, 1, 1))
 
-        let modelMatrix = modelMatrix(translation: SIMD3(0, 0, 0), rotation: SIMD3(0, 0, 0), scale: SIMD3(1, 1, 1))
-
-        let viewMatrix = camera.viewMatrix()
+        let viewMatrix = world.camera.viewMatrix()
         let aspectRatio = Float(view.drawableSize.width / view.drawableSize.height)
-        let projectionMatrix = camera.projectionMatrix(
+        let projectionMatrix = world.camera.projectionMatrix(
             aspectRatio: aspectRatio,
             fov: radians_from_degrees(65),
             nearPlane: 0.1,

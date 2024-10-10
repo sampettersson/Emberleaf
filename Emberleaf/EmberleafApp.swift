@@ -11,7 +11,7 @@ import SwiftUI
 struct EmberleafApp: App {
     var body: some Scene {
         WindowGroup {
-            MetalView()
+            DemoView()
         }
     }
 }
