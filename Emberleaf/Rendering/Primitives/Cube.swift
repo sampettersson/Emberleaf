@@ -6,18 +6,31 @@
 //
 
 import simd
+import SwiftUI
 
 struct Cube: Component {
-    let vertices: [Vertex] = [
-        Vertex(position: SIMD3(-1, -1,  1), color: SIMD4(1, 0, 0, 1)), // 0: Front bottom-left
-        Vertex(position: SIMD3( 1, -1,  1), color: SIMD4(0, 1, 0, 1)), // 1: Front bottom-right
-        Vertex(position: SIMD3( 1,  1,  1), color: SIMD4(0, 0, 1, 1)), // 2: Front top-right
-        Vertex(position: SIMD3(-1,  1,  1), color: SIMD4(1, 1, 0, 1)), // 3: Front top-left
-        Vertex(position: SIMD3(-1, -1, -1), color: SIMD4(1, 0, 1, 1)), // 4: Back bottom-left
-        Vertex(position: SIMD3( 1, -1, -1), color: SIMD4(0, 1, 1, 1)), // 5: Back bottom-right
-        Vertex(position: SIMD3( 1,  1, -1), color: SIMD4(1, 1, 1, 1)), // 6: Back top-right
-        Vertex(position: SIMD3(-1,  1, -1), color: SIMD4(0, 0, 0, 1))  // 7: Back top-left
-    ]
+    var color: Color
+    
+    var vertices: [Vertex] {
+        var colorVec = SIMD4<Float>()
+        let resolvedColor = color.resolve(in: EnvironmentValues())
+        
+        colorVec.x = resolvedColor.red
+        colorVec.y = resolvedColor.green
+        colorVec.z = resolvedColor.blue
+        colorVec.w = resolvedColor.opacity
+        
+        return [
+            Vertex(position: SIMD3(-1, -1,  1), color: colorVec), // 0: Front bottom-left
+            Vertex(position: SIMD3( 1, -1,  1), color: colorVec), // 1: Front bottom-right
+            Vertex(position: SIMD3( 1,  1,  1), color: colorVec), // 2: Front top-right
+            Vertex(position: SIMD3(-1,  1,  1), color: colorVec), // 3: Front top-left
+            Vertex(position: SIMD3(-1, -1, -1), color: colorVec), // 4: Back bottom-left
+            Vertex(position: SIMD3( 1, -1, -1), color: colorVec), // 5: Back bottom-right
+            Vertex(position: SIMD3( 1,  1, -1), color: colorVec), // 6: Back top-right
+            Vertex(position: SIMD3(-1,  1, -1), color: colorVec)  // 7: Back top-left
+        ]
+    }
 
     let indices: [UInt16] = [
         // Front face

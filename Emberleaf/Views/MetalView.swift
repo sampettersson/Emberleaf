@@ -42,6 +42,7 @@ struct MetalView: NSViewRepresentable {
 
 struct MetalView: UIViewRepresentable {
     var device = MTLCreateSystemDefaultDevice()
+    var world: World
     
     func makeUIView(context: Context) -> MTKView {
         MTKView(frame: .zero, device: device)
@@ -50,19 +51,20 @@ struct MetalView: UIViewRepresentable {
     class Coordinator {
         let renderer: Renderer
         
-        init(device: MTLDevice) {
-            self.renderer = Renderer(device: device)
+        init(device: MTLDevice, world: World) {
+            self.renderer = Renderer(device: device, world: world)
         }
     }
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(device: device!)
+        Coordinator(device: device!, world: world)
     }
     
     func updateUIView(_ view: MTKView, context: Context) {
         view.clearColor = MTLClearColorMake(0, 0, 0, 0)
         view.delegate = context.coordinator.renderer
         view.depthStencilPixelFormat = .depth32Float
+        context.coordinator.renderer.updateWorld(world)
     }
 }
 
