@@ -7,7 +7,7 @@
 
 import simd
 
-struct Camera {
+struct Camera: Component {
     var position: SIMD3<Float>
     var target: SIMD3<Float>
     var up: SIMD3<Float>

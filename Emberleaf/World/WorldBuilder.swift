@@ -7,7 +7,7 @@
 
 @resultBuilder
 struct WorldBuilder {
-    static func buildBlock(_ components: Camera...) -> World {
-        return World(camera: components.first!)
+    public static func buildBlock(_ entities: Entity...) -> World {
+        return World(entities: entities)
     }
 }
