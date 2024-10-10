@@ -116,11 +116,7 @@ class Renderer: NSObject, MTKViewDelegate {
             znear: 0,
             zfar: 1
         ))
-        
-        let (_, cube, transform) = world.query(with: Cube.self, Transform.self)!
-
-        let modelMatrix = modelMatrix(translation: transform.translation, rotation: transform.rotation, scale: transform.scale)
-        
+                
         let (_, camera) = world.query(with: Camera.self)!
 
         let viewMatrix = camera.viewMatrix()
@@ -131,10 +127,6 @@ class Renderer: NSObject, MTKViewDelegate {
             nearPlane: 0.1,
             farPlane: 100
         )
-
-        var uniforms = Uniforms(modelMatrix: modelMatrix, viewMatrix: viewMatrix, projectionMatrix: projectionMatrix)
-        renderEncoder?.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
-        renderEncoder?.setCullMode(.none)
         
         if let (_, light, transform) = world.query(with: Light.self, Transform.self) {
             var resolvedLight = ResolvedLight(light, transform)
@@ -142,26 +134,34 @@ class Renderer: NSObject, MTKViewDelegate {
             renderEncoder?.setVertexBytes(&resolvedLight, length: MemoryLayout<ResolvedLight>.stride, index: 2)
             renderEncoder?.setFragmentBytes(&resolvedLight, length: MemoryLayout<ResolvedLight>.stride, index: 2)
         }
-                
-        let vertexBuffer = device.makeBuffer(
-            bytes: cube.vertices,
-            length: cube.vertices.count * MemoryLayout<Vertex>.stride, options: []
-        )!
         
-        let indexBuffer = device.makeBuffer(
-            bytes: cube.indices,
-            length: cube.indices.count * MemoryLayout<UInt16>.stride,
-            options: []
-        )!
+        for (entity, cube, transform) in world.queryAll(with: Cube.self, Transform.self) {
+            let modelMatrix = modelMatrix(translation: transform.translation, rotation: transform.rotation, scale: transform.scale)
+            
+            var uniforms = Uniforms(modelMatrix: modelMatrix, viewMatrix: viewMatrix, projectionMatrix: projectionMatrix)
+            renderEncoder?.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
+            
+            // Set up vertex and index buffers
+            let vertexBuffer = device.makeBuffer(
+                bytes: cube.vertices,
+                length: cube.vertices.count * MemoryLayout<Vertex>.stride, options: []
+            )!
+            
+            let indexBuffer = device.makeBuffer(
+                bytes: cube.indices,
+                length: cube.indices.count * MemoryLayout<UInt16>.stride,
+                options: []
+            )!
 
-        renderEncoder?.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
-        renderEncoder?.drawIndexedPrimitives(
-            type: .triangle,
-            indexCount: cube.indices.count,
-            indexType: .uint16,
-            indexBuffer: indexBuffer,
-            indexBufferOffset: 0
-        )
+            renderEncoder?.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
+            renderEncoder?.drawIndexedPrimitives(
+                type: .triangle,
+                indexCount: cube.indices.count,
+                indexType: .uint16,
+                indexBuffer: indexBuffer,
+                indexBufferOffset: 0
+            )
+        }
 
         renderEncoder?.endEncoding()
         commandBuffer?.present(drawable)

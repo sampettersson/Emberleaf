@@ -25,6 +25,12 @@ struct DemoView: View {
                 scale: SIMD3(1, 1, 1)
             )
             
+            Entity() & Cube(color: .cyan.opacity(0.2)) & Transform(
+                translation: SIMD3(3, 0, 0),
+                rotation: SIMD3(rotationX, rotationY, 0),
+                scale: SIMD3(1, 1, 1)
+            )
+            
             Entity() & Light(color: .white, intensity: 1.0) & Transform(
                 translation: SIMD3(2, 2, 2),
                 rotation: SIMD3(0, 0, 0),

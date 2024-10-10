@@ -40,4 +40,13 @@ extension World {
         
         return (entity, repeat entity.getComponent(each type))
     }
+    
+    /// Finds all entities in the world with a set of requested component types.
+    func queryAll<each T: Component>(with type: repeat (each T).Type) -> [(Entity, repeat each T)] {
+        return entities.filter { entity in
+            entity.hasAllComponents(repeat each type)
+        }.map { entity in
+            (entity, repeat entity.getComponent(each type))
+        }
+    }
 }
