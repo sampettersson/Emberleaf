@@ -135,7 +135,7 @@ class Renderer: NSObject, MTKViewDelegate {
             renderEncoder?.setFragmentBytes(&resolvedLight, length: MemoryLayout<ResolvedLight>.stride, index: 2)
         }
         
-        for (entity, cube, transform) in world.queryAll(with: Cube.self, Transform.self) {
+        for (_, mesh, transform) in world.queryAll(with: Mesh.self, Transform.self) {
             let modelMatrix = modelMatrix(translation: transform.translation, rotation: transform.rotation, scale: transform.scale)
             
             var uniforms = Uniforms(modelMatrix: modelMatrix, viewMatrix: viewMatrix, projectionMatrix: projectionMatrix)
@@ -143,20 +143,20 @@ class Renderer: NSObject, MTKViewDelegate {
             
             // Set up vertex and index buffers
             let vertexBuffer = device.makeBuffer(
-                bytes: cube.vertices,
-                length: cube.vertices.count * MemoryLayout<Vertex>.stride, options: []
+                bytes: mesh.vertices,
+                length: mesh.vertices.count * MemoryLayout<Vertex>.stride, options: []
             )!
             
             let indexBuffer = device.makeBuffer(
-                bytes: cube.indices,
-                length: cube.indices.count * MemoryLayout<UInt16>.stride,
+                bytes: mesh.indices,
+                length: mesh.indices.count * MemoryLayout<UInt16>.stride,
                 options: []
             )!
 
             renderEncoder?.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
             renderEncoder?.drawIndexedPrimitives(
                 type: .triangle,
-                indexCount: cube.indices.count,
+                indexCount: mesh.indices.count,
                 indexType: .uint16,
                 indexBuffer: indexBuffer,
                 indexBufferOffset: 0

@@ -11,6 +11,10 @@ struct DemoView: View {
     @State var rotationX: Float = 0
     @State var rotationY: Float = 0
     
+    var rotation: SIMD3<Float> {
+        SIMD3(rotationX, rotationY, 0)
+    }
+    
     var body: some View {
         EmberleafRenderer {
             Entity() & Camera(
@@ -19,21 +23,27 @@ struct DemoView: View {
                 up: SIMD3<Float>(0, 1, 0)
             )
             
-            Entity() & Cube(color: .cyan.opacity(0.2)) & Transform(
+            Entity() & Mesh.cube(color: .cyan) & Transform(
                 translation: SIMD3(0, 0, 0),
-                rotation: SIMD3(rotationX, rotationY, 0),
+                rotation: rotation,
                 scale: SIMD3(1, 1, 1)
             )
             
-            Entity() & Cube(color: .cyan.opacity(0.2)) & Transform(
+            Entity() & Mesh.sphere(radius: 1, stacks: 80, slices: 80, color: .cyan) & Transform(
                 translation: SIMD3(3, 0, 0),
-                rotation: SIMD3(rotationX, rotationY, 0),
+                rotation: rotation,
+                scale: SIMD3(1, 1, 1)
+            )
+            
+            Entity() & Mesh.cube(color: .cyan) & Transform(
+                translation: SIMD3(-3, 0, 0),
+                rotation: rotation,
                 scale: SIMD3(1, 1, 1)
             )
             
             Entity() & Light(color: .white, intensity: 1.0) & Transform(
-                translation: SIMD3(2, 2, 2),
-                rotation: SIMD3(0, 0, 0),
+                translation: SIMD3(0, 2, 0),
+                rotation: rotation,
                 scale: SIMD3(1, 1, 1)
             )
         }.gesture(DragGesture().onChanged({ value in
